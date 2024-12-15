@@ -7,3 +7,6 @@ package-lock.json
 json.sqlite
 node_modules
 src/config.json
+*.tsbuildinfo
+logs
+.env
