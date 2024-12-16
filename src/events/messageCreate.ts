@@ -1,25 +1,24 @@
 /* eslint-disable max-len */
 import { Message, PermissionsBitField, Collection, ChannelType } from 'discord.js';
 import { DB } from '../modules/database.js';
-
 const cooldown = new Collection();
 
-client.on('messageCreate', async (message: Message) => {
+global.client.on('messageCreate', async (message: Message) => {
 	if (message.author.bot) return;
 
 	if (message.channel.type == ChannelType.GuildText) { // GUILD TEXT - 0
 		const MemMember = await DB.getGuildMember(message.guild, message.member);
 
 		MemMember.messages += 1;
-		await rankSystem.addExp(message.member, 0.125);
+		await global.rankSystem.addExp(message.member, 0.125);
 
-		if (message.content) log.add(`[${message.channel.name}] ${message.author.tag}: ${message.content}`, message.guild);
+		if (message.content) global.log.add(`[${message.channel.name}] ${message.author.tag}: ${message.content}`, message.guild);
 		if (message.attachments.size != 0) {
 			let logText = '';
 			message.attachments.forEach((el: any) => {
 				logText = logText.concat(` (${el.name}, ${el.url})`);
 			});
-			log.add(`[${message.channel.name}] [attachments] ${message.author.tag}:${logText}`, message.guild);
+			global.log.add(`[${message.channel.name}] [attachments] ${message.author.tag}:${logText}`, message.guild);
 		}
 
 		if ((message.content.includes('+rep') || message.content.includes('+реп')) && message.reference) {
@@ -56,35 +55,35 @@ client.on('messageCreate', async (message: Message) => {
 		}
 	}
 
-	if (!message.content.startsWith(config.prefix)) {
+	if (!message.content.startsWith(global.config.prefix)) {
 		return;
 	}
 
-	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+	const args = message.content.slice(global.config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const cmd = client.commands.get(command);
+	const cmd = global.client.commands.get(command);
 
 	if (cmd) {
 		if (cmd.userPerms || cmd.botPerms) {
 			if (!message.member.permissions.has(PermissionsBitField.resolve(cmd.userPerms || []))) {
 				return message.reply({
 					embeds: [{
-						color: client.color,
-						description: `У тебя нет разрешения \`${client.namePermission(cmd.userPerms)}\` чтобы использовать эту команду!`
+						color: global.client.color,
+						description: `У тебя нет разрешения \`${global.client.namePermission(cmd.userPerms)}\` чтобы использовать эту команду!`
 					}]
 				});
 			}
-			if (!message.guild.members.cache.get(client.user.id).permissions.has(PermissionsBitField.resolve(cmd.botPerms || []))) {
+			if (!message.guild.members.cache.get(global.client.user.id).permissions.has(PermissionsBitField.resolve(cmd.botPerms || []))) {
 				return message.reply({
 					embeds: [{
-						color: client.color,
-						description: `У меня нет разрешения \`${client.namePermission(cmd.botPerms)}\` чтобы использовать эту команду!`
+						color: global.client.color,
+						description: `У меня нет разрешения \`${global.client.namePermission(cmd.botPerms)}\` чтобы использовать эту команду!`
 					}]
 				});
 			}
 		}
 		// eslint-disable-next-line no-param-reassign
 		message.args = args;
-		cmd.run(client, message);
+		cmd.run(global.client, message);
 	}
 });

@@ -1,9 +1,9 @@
-const { player } = client;
+const { player } = global.client;
 
 player.on('addSong', async (queue: any, song: any) => {
 	await queue.textChannel.send({
 		embeds: [{
-			color: client.color,
+			color: global.client.color,
 			title: '<:queue:1085224494513279026> Очередь',
 			description: `Трек **${song.name}** добавлен в очередь.`,
 			footer: {
@@ -16,9 +16,9 @@ player.on('addSong', async (queue: any, song: any) => {
 player.on('finish', async (queue: any) => {
 	await queue.textChannel.send({
 		embeds: [{
-			color: client.color,
+			color: global.client.color,
 			title: '<:queue:1085224494513279026> Очередь',
-			description: 'В очереди не осталось треков и музыка закончилась.',
+			description: 'В очереди не осталось треков и музыка закончилась.'
 		}]
 	});
 });
@@ -26,14 +26,14 @@ player.on('finish', async (queue: any) => {
 player.on('playSong', async (queue: any, song: any) => {
 	try {
 		const exampleEmbed = {
-			color: client.color,
+			color: global.client.color,
 			title: song.name,
 			thumbnail: {
 				url: song.thumbnail
 			},
 			fields: [
 				{ name: 'Время', value: `${song.formattedDuration}`, inline: true },
-				{ name: 'Битрейт', 
+				{ name: 'Битрейт',
 				  value: song.formats[0].audioBitrate ? `${song.formats[0].audioBitrate} kbps` : '192 kbps',
 				  inline: true
 				},
@@ -54,7 +54,7 @@ player.on('playSong', async (queue: any, song: any) => {
 
 player.on('error', async (textChannel: any, e: any) => {
 	if (textChannel) {
-		await sendEmbed.info(textChannel, 'Ошибка', `Произошла ошибка: ${e}`);
+		await global.sendEmbed.info(textChannel, 'Ошибка', `Произошла ошибка: ${e}`);
 		console.error(`Music Player Error:\n\n${e}\n\nCode: ${e.code}`);
 	}
 });

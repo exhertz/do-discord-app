@@ -1,8 +1,6 @@
-// eslint-disable-next-line import/no-import-module-exports
 import {
 	Client, PermissionsBitField, REST, Routes
 } from 'discord.js';
-// eslint-disable-next-line import/no-import-module-exports
 
 import fs from 'fs';
 import path from 'node:path';

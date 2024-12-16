@@ -5,12 +5,12 @@ global.sendEmbed = {
 				// color: client.color,
 				color: 0x2f3136,
 				title: header,
-				description: `<:xmark:1033743397644681338>  ${message}`
+				description: `<:xmark:1317652507820036226>  ${message}`
 			}],
 			ephemeral: true
 		});
 	},
-	info: async (orig: any, header: string, message: string, inputColor: number = client.color) => {
+	info: async (orig: any, header: string, message: string, inputColor: number = global.client.color) => {
 		const msg = {
 			embeds: [{
 				color: inputColor,
@@ -30,7 +30,7 @@ global.sendEmbed = {
 		header: string,
 		message: string,
 		inputFooterText: string,
-		inputColor: number = client.color
+		inputColor: number = global.client.color
 	) => ({
 		color: inputColor,
 		title: header,

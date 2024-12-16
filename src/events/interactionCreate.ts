@@ -1,11 +1,7 @@
-/* eslint-disable object-curly-newline */
-/* eslint-disable max-len */
-
 import {
 	Guild,
 	PermissionsBitField,
 	User,
-	AttachmentBuilder,
 	TextInputStyle,
 	Collection,
 	ChannelType
@@ -16,7 +12,7 @@ import { DB } from '../modules/database.js';
 
 const cooldown = new Collection();
 
-client.on('interactionCreate', async (interaction: any) => {
+global.client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.guild) {
 		if (interaction.isButton()) {
 			if (interaction.customId == 'menu_invite') {
@@ -24,15 +20,27 @@ client.on('interactionCreate', async (interaction: any) => {
 					title: 'Удаленный инвайт',
 					custom_id: 'modalMenuInvite',
 					components: [{
-						// eslint-disable-next-line object-curly-newline
-						type: 1, components: [{ type: 4, custom_id: 'guildid', label: 'GUILD ID', style: TextInputStyle.Short, min_length: 1, max_length: 30, placeholder: '', required: false }]
+						type: 1, components: [{
+							type: 4,
+							custom_id: 'guildid',
+							label: 'GUILD ID',
+							style: TextInputStyle.Short,
+							min_length: 1,
+							max_length: 30,
+							placeholder: '',
+							required: false
+						}]
 					}]
 				});
 
-				const submitted = await interaction.awaitModalSubmit({ time: 60000, filter: (i: any) => i.user.id === interaction.user.id }).catch(console.log);
+				const submitted = await interaction.awaitModalSubmit({
+					time: 60000,
+					filter: (i: any) => i.user.id === interaction.user.id
+				}).catch(console.log);
+
 				if (submitted) {
 					const guildID = submitted.fields.getTextInputValue('guildid');
-					client.guilds.fetch(guildID).then(async (guild: Guild) => {
+					global.client.guilds.fetch(guildID).then(async (guild: Guild) => {
 						console.log(interaction.user.id);
 						await guild.members.unban(interaction.user).catch(() => {});
 						const channel = guild.channels.cache.filter((c) => c.type == ChannelType.GuildText).first();
@@ -74,16 +82,20 @@ client.on('interactionCreate', async (interaction: any) => {
 				};
 				await interaction.showModal(modal);
 
-				const submitted = await interaction.awaitModalSubmit({ time: 600000, filter: (i: any) => i.user.id === interaction.user.id }).catch(console.error);
+				const submitted = await interaction.awaitModalSubmit({
+					time: 600000,
+					filter: (i: any) => i.user.id === interaction.user.id
+				}).catch(console.error);
+
 				if (submitted) {
 					const inputId = submitted.fields.getTextInputValue('userId');
 
-					const user: User = await client.users.fetch(inputId);
+					const user: User = await global.client.users.fetch(inputId);
 					const MemUser = await DB.getUser(user);
 					const clovers = MemUser?.clovers;
 
 					const createdEmbed = {
-						color: client.color,
+						color: global.client.color,
 						title: user.tag,
 						description: `Bot?: ${user.bot}\nRegistered: ${moment(user.createdAt).format('DD-MM-YYYY')}\nClovers: ${clovers ?? 'Отсутствует'}`,
 						thumbnail: { url: user.avatarURL() }
@@ -97,29 +109,29 @@ client.on('interactionCreate', async (interaction: any) => {
 	}
 
 	if (interaction.isContextMenuCommand()) {
-		const cmd = client.contextMenuCommands.get(`${interaction.commandName}`);
-		if (cmd) await cmd.run(client, interaction);
+		const cmd = global.client.contextMenuCommands.get(`${interaction.commandName}`);
+		if (cmd) cmd.run(global.client, interaction);
 	}
 
 	if (interaction.isCommand()) {
-		const cmd = client.slashCommands.get(`${interaction.commandName}`);
+		const cmd = global.client.slashCommands.get(`${interaction.commandName}`);
 		if (!cmd) return;
 
 		if (cmd.userPerms || cmd.botPerms) {
 			if (!interaction.memberPermissions.has(PermissionsBitField.resolve(cmd.userPerms || []))) {
 				return interaction.reply({
 					embeds: [{
-						color: client.color,
-						description: `У тебя нет разрешения \`${client.namePermission(cmd.userPerms)}\` чтобы использовать эту команду!`
+						color: global.client.color,
+						description: `У тебя нет разрешения \`${global.client.namePermission(cmd.userPerms)}\` чтобы использовать эту команду!`
 					}],
 					ephemeral: true
 				});
 			}
-			if (!interaction.guild.members.cache.get(client.user.id).permissions.has(PermissionsBitField.resolve(cmd.botPerms || []))) {
+			if (!interaction.guild.members.cache.get(global.client.user.id).permissions.has(PermissionsBitField.resolve(cmd.botPerms || []))) {
 				return interaction.reply({
 					embeds: [{
-						color: client.color,
-						description: `У меня нет разрешения \`${client.namePermission(cmd.botPerms)}\` чтобы использовать эту команду!`
+						color: global.client.color,
+						description: `У меня нет разрешения \`${global.client.namePermission(cmd.botPerms)}\` чтобы использовать эту команду!`
 					}],
 					ephemeral: true
 				});
@@ -141,7 +153,7 @@ client.on('interactionCreate', async (interaction: any) => {
 				});
 			}
 			try {
-				await cmd.run(client, interaction);
+				await cmd.run(global.client, interaction);
 				cooldown.set(`slash-${cmd.name}${interaction.user.id}`, Date.now() + cmd.cooldown);
 				setTimeout(() => {
 					cooldown.delete(`slash-${cmd.name}${interaction.user.id}`);
@@ -151,7 +163,7 @@ client.on('interactionCreate', async (interaction: any) => {
 			}
 		} else {
 			try {
-				await cmd.run(client, interaction);
+				await cmd.run(global.client, interaction);
 			} catch (e) {
 				console.error(e);
 			}

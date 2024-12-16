@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-import-module-exports
 import { GuildMember } from 'discord.js';
-import addexp from '../commands/slash/addexp.js';
 import { DB } from './database.js';
 
 const AddEXP = async (member: GuildMember, experience: number) => {

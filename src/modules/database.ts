@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { QuickDB } from 'quick.db';
 
 console.log('Module DATABASE loaded!');
@@ -138,5 +137,4 @@ function genProxy(table, db_obj, ds_obj) {
 	});
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export { DB };

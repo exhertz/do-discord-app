@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-import-module-exports
 import { Client } from 'discord.js';
 
 import fs from 'fs';

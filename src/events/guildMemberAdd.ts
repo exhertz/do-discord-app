@@ -1,7 +1,7 @@
-import { GuildMember, ChannelType, EmbedBuilder, Channel, TextChannel } from 'discord.js';
+import { GuildMember, ChannelType, EmbedBuilder, TextChannel } from 'discord.js';
 import { DB } from '../modules/database.js';
 
-client.on('guildMemberAdd', async (member: GuildMember) => {
+global.client.on('guildMemberAdd', async (member: GuildMember) => {
 	if (!member.guild) return;
 
 	const MemGuild = await DB.getGuild(member.guild);
@@ -23,9 +23,9 @@ client.on('guildMemberAdd', async (member: GuildMember) => {
 			console.error(e);
 		}
 		const roleName = (await member.guild.roles.fetch(roleJoin)).name;
-		log.add(`[SERVER] [JOIN] ${member.user.tag} подключился к серверу, получил роль ${roleName}`, member.guild);
+		global.log.add(`[SERVER] [JOIN] ${member.user.tag} подключился к серверу, получил роль ${roleName}`, member.guild);
 	} else {
-		log.add(`[SERVER] [JOIN] ${member.user.tag} подключился к серверу.`, member.guild);
+		global.log.add(`[SERVER] [JOIN] ${member.user.tag} подключился к серверу.`, member.guild);
 	}
 
 	if (channelJoin) {

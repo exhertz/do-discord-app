@@ -1,7 +1,7 @@
 import { Role } from 'discord.js';
 import { DB } from '../modules/database.js';
 
-client.on('roleDelete', async (role: Role) => {
+global.client.on('roleDelete', async (role: Role) => {
 	const MemGuild = await DB.getGuild(role.guild);
 	if (!MemGuild) return;
 
