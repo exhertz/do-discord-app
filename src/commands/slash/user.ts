@@ -29,15 +29,14 @@ const cmd: SlashCommand = {
 			};
 		}
 
-		const rank = new Canvacord.Rank()
+		const rank = new Canvacord.RankCardBuilder()
 			.setAvatar(statUser.displayAvatarURL())
 			.setLevel(MemMember.level)
 			.setCurrentXP(Math.trunc(MemMember.exp))
 			.setRequiredXP((MemMember.level * 2) + 2)
 			.setStatus(statUser.presence ? statUser.presence.status : 'offline')
-			.setProgressBar('#FFFFFF', 'COLOR')
-			.setUsername(statUser.displayName)
-			.setDiscriminator(statUser.displayName);
+			.setUsername(statUser.displayName);
+			// .setDiscriminator(statUser.displayName);
 
 		await interaction.deferReply();
 		await interaction.deleteReply();

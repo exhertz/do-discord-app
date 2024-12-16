@@ -14,11 +14,4 @@ client.on('ready', async () => {
 	setInterval(() => {
 		console.log(`[~] ${new Date().toLocaleDateString().slice(0, -5)} ${new Date().toLocaleTimeString()} | PING: ${Math.round(client.ws.ping)} ms`);
 	}, 1800000);
-	bot.sendMessage(bot.chat, `${DateNow()} - DJS14 STARTED!`);
 });
-
-function DateNow() {
-	const date = new Date();
-	const padTo2Digits = (num: number) => num.toString().padStart(2, '0');
-	return (`${[date.getFullYear(), padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('-')} ${[padTo2Digits(date.getHours()), padTo2Digits(date.getMinutes()), padTo2Digits(date.getSeconds())].join(':')}`);
-}

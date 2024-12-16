@@ -34,7 +34,7 @@ type SlashOptions = {
 	description: string,
 	type: number,
 	required: boolean,
-	choices?: Array<Object>
+	choices?: Array<object>
 }
 
 export interface SlashCommand {

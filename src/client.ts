@@ -8,12 +8,11 @@ import {
 	Partials
 } from 'discord.js';
 
-import TelegramBotAPI from 'node-telegram-bot-api';
 import { DisTube } from 'distube';
-import { SpotifyPlugin } from '@distube/spotify';
-import { YtDlpPlugin } from '@distube/yt-dlp';
 
-import cfg from './config.json' assert { type: 'json' };
+import 'dotenv/config';
+
+// import cfg from './config.json' assert { type: 'json' };
 
 import('./modules/checkmoder.js');
 import('./modules/log.js');
@@ -22,11 +21,8 @@ import('./modules/senderEmbed.js');
 
 console.time('Start bot time');
 
-global.config = cfg;
-
-global.bot = new TelegramBotAPI(config.token_telegram, { polling: true });
-bot.chat = Number(cfg.adminTgChatId);
-bot.adminId = Number(cfg.adminId);
+global.config = process.env;
+// global.config = cfg;
 
 global.client = new Client({
 	intents: [
@@ -50,8 +46,7 @@ global.client = new Client({
 	]
 });
 
-client.player = new DisTube(client, {
-	searchSongs: 1,
+global.client.player = new DisTube(global.client, {
 	searchCooldown: 30,
 	leaveOnStop: false,
 	leaveOnFinish: false,
@@ -60,7 +55,7 @@ client.player = new DisTube(client, {
 	emitNewSongOnly: true,
 	emitAddSongWhenCreatingQueue: false,
 	emitAddListWhenCreatingQueue: false,
-	youtubeCookie: config.youtubeCookie,
+	youtubeCookie: global.config.youtubeCookie,
 	ytdlOptions: {
 		highWaterMark: 1024 * 1024 * 32,
 		quality: 'highestaudio',
@@ -68,56 +63,47 @@ client.player = new DisTube(client, {
 		dlChunkSize: 0,
 		filter: 'audioonly'
 	},
-	plugins: [
-		new SpotifyPlugin({
-			parallel: true,
-			emitEventsAfterFetching: true,
-			api: {
-				clientId: config.spotifyId,
-				clientSecret: config.spotifySecret
-			}
-		}),
-		new YtDlpPlugin({
-			update: true
-		})
-	]
+	plugins: []
 });
 
 import('./playerEvents.js');
 
-client.voiceTime = new Map();
-client.commands = new Collection();
-client.slashCommands = new Collection();
-client.contextMenuCommands = new Collection();
+global.client.voiceTime = new Map();
+global.client.commands = new Collection();
+global.client.slashCommands = new Collection();
+global.client.contextMenuCommands = new Collection();
 
-client.color = 0x986AF0;
-client.debug = false;
+global.client.color = 0x4CCD99;
+global.client.debug = false;
 
-import('./handlers/command.js').then((m) => {
-	m.default(client).catch((e) => console.error(e));
+import('./handlers/commands.js').then((m) => {
+	m.default(global.client).catch((e) => console.error(e));
 });
 import('./handlers/events.js').then((m) => {
-	m.default(client).catch((e) => console.error(e));
+	m.default(global.client).catch((e) => console.error(e));
 });
 import('./handlers/slashCommand.js').then((m) => {
-	m.default(client).catch((e) => console.error(e));
+	m.default(global.client).catch((e) => console.error(e));
 });
 
-client.login(config.token);
+global.client.login(global.config.token);
 
-process.on('unhandledRejection', (reason: any, promise: any) => {
-	bot.sendMessage(bot.chat, `DJS14 unhandled error!\n\n${JSON.stringify(promise)}\n\nReason: ${reason}\n\nStack: ${reason.stack}`);
+process.on('unhandledRejection', (reason: Error, promise: Promise<any>) => {
+	console.error(`DJS14 unhandled error!\n\n${JSON.stringify(promise)}\n\nReason: ${reason}\n\nStack: ${reason.stack}`);
+	// bot.sendMessage(bot.chat, `DJS14 unhandled error!\n\n${JSON.stringify(promise)}\n\nReason: ${reason}\n\nStack: ${reason.stack}`);
 });
-process.on("uncaughtException", async (err: any) => {
-	bot.sendMessage(bot.chat, `DJS14 uncaughtException error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
+process.on('uncaughtException', async (err: Error) => {
+	console.error(`DJS14 uncaughtException error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
+	// bot.sendMessage(bot.chat, `DJS14 uncaughtException error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
 });
-process.on("uncaughtExceptionMonitor", async (err: any) => {
-	bot.sendMessage(bot.chat, `DJS14 uncaughtExceptionMonitor error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
+process.on('uncaughtExceptionMonitor', async (err: Error) => {
+	console.error(`DJS14 uncaughtExceptionMonitor error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
+	// bot.sendMessage(bot.chat, `DJS14 uncaughtExceptionMonitor error!\n\n${JSON.stringify(err)}\n\nReason: ${err}\n\nStack: ${err.stack}`);
 });
 
 /* TODO: fix everything related to this */
-client.namePermission = (perms: string) => {
-	interface PFB { [key: string]: any, }
+global.client.namePermission = (perms: string) => {
+	interface PFB { [key: string]: unknown, }
 	const PermissionFlagsBits: PFB = {
 		AddReactions: 'добавлять реакции на сообщения',
 		Administrator: 'администратора',

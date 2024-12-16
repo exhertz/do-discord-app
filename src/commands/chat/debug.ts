@@ -8,7 +8,7 @@ const cmd: Command = {
 
 	run: async (client, message) => {
 		if (message.channel.type != 1) return;
-		if (message.author.id != bot.adminId) return;
+		if (message.author.id != config.adminId) return;
 
 		const action: any = {
 			type: 1, // Action Row

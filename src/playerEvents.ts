@@ -55,7 +55,7 @@ player.on('playSong', async (queue: any, song: any) => {
 player.on('error', async (textChannel: any, e: any) => {
 	if (textChannel) {
 		await sendEmbed.info(textChannel, 'Ошибка', `Произошла ошибка: ${e}`);
-		await bot.sendMessage(bot.chat, `Music Player Error:\n\n${e}\n\nCode: ${e.code}`);
+		console.error(`Music Player Error:\n\n${e}\n\nCode: ${e.code}`);
 	}
 });
 
@@ -70,7 +70,7 @@ player.on('empty', async (queue: any) => {
 });
 
 player.on('searchNoResult', (message: any, query: any) => {
-	bot.sendMessage(bot.chat, `SEARCH NO RESULT\n\n${JSON.stringify(query)}`);
+	console.error(`SEARCH NO RESULT\n\n${JSON.stringify(query)}`);
 });
 
 export default {};

@@ -9,9 +9,9 @@ import path from 'node:path';
 import { Table } from 'console-table-printer';
 import { fileURLToPath } from 'url';
 
-const p = new Table({
+const createCommandTable = (label: string) => new Table({
 	columns: [
-		{ name: 'SlashCommands', alignment: 'center' }, // with alignment and color
+		{ name: label, alignment: 'center' },
 		{ name: 's', alignment: 'center' }
 	],
 	colorMap: {
@@ -19,15 +19,8 @@ const p = new Table({
 	}
 });
 
-const v = new Table({
-	columns: [
-		{ name: 'ContextMenuCommands', alignment: 'center' }, // with alignment and color
-		{ name: 's', alignment: 'center' }
-	],
-	colorMap: {
-		custom_green: '\x1b[32m'
-	}
-});
+const p = createCommandTable('SlashCommands');
+const v = createCommandTable('ContextMenuCommands');
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -38,25 +31,15 @@ export default async (client: Client) => {
 	await loadMenuCommand(allCommands);
 
 	const rest = new REST({ version: '10' }).setToken(config.token);
-	await (async () => {
-		try {
-			if (client.debug) {
-				await rest.put(
-					Routes.applicationGuildCommands(config.clientID, '974695530636673034'), // 974695530636673034
-					{ body: allCommands }
-				);
-			} else {
-				await rest.put(
-					Routes.applicationCommands(config.clientID),
-					{ body: allCommands }
-				)
-					.catch((er: any) => console.log(er));
-			}
-			console.log('Successfully reloaded application & slash (/) commands.');
-		} catch (error) {
-			console.log(error);
-		}
-	})();
+
+	await rest.put(
+		client.debug
+			? Routes.applicationGuildCommands(config.clientID, config.debugGuildId)
+			: Routes.applicationCommands(config.clientID),
+		{ body: allCommands }
+	)
+		.then(() => console.log('Successfully reloaded application & slash (/) commands.'))
+		.catch((er) => console.log(er));
 };
 
 async function loadSlashCommand(allCommands) {
@@ -71,30 +54,24 @@ async function loadSlashCommand(allCommands) {
 			// eslint-disable-next-line no-await-in-loop
 			const command = (await import(cmdPath)).default;
 
-			if (!command) {
-				p.addRow({ SlashCommands: 'Unknown', s: '-' }, { color: 'red' });
-				continue;
+			if (command) {
+				allCommands.push({
+					name: command.name,
+					description: command.description,
+					options: command.options || null,
+					default_permission: command.defaultPermission || null,
+					default_member_permissions: command.default_member_permissions
+						? PermissionsBitField.resolve(command.default_member_permissions).toString()
+						: null
+				});
+	
+				client.slashCommands.set(command.name, command);
 			}
 
-			allCommands.push({
-				name:
-					command.name,
-				description:
-					command.description,
-				options:
-					command.options ? command.options : null,
-				default_permission:
-					command.defaultPermission ? command.defaultPermission : null, // command.default_permission
-				default_member_permissions:
-					command.default_member_permissions ? PermissionsBitField.resolve(command.default_member_permissions)
-						.toString() : null
-			});
-
-			client.slashCommands.set(command.name, command);
 			p.addRow({
-				SlashCommands: command.name,
-				s: '+'
-			}, { color: 'custom_green' });
+				SlashCommands: `${file} -> ${command ? command.name : 'Unknown'}`,
+				s: command ? '+' : '-'
+			}, { color: command ? 'custom_green' : 'red' });
 		} catch (e) {
 			console.log(e);
 		}
@@ -115,18 +92,19 @@ async function loadMenuCommand(allCommands) {
 			// eslint-disable-next-line no-await-in-loop
 			const command = (await import(cmdPath)).default;
 
-			if (!command) {
-				v.addRow({ ContextMenuCommands: 'Unknown', s: '-' }, { color: 'red' });
-				continue;
+			if (command) {
+				allCommands.push({
+					name: command.name,
+					type: command.type
+				});
+	
+				client.contextMenuCommands.set(command.name, command);
 			}
-
-			allCommands.push({
-				name: command.name,
-				type: command.type
-			});
-
-			client.contextMenuCommands.set(command.name, command);
-			v.addRow({ ContextMenuCommands: command.name, s: '+' }, { color: 'custom_green' });
+			
+			v.addRow({
+				ContextMenuCommands: `${file} -> ${command ? command.name : 'Unknown'}`,
+				s: command ? '+' : '-'
+			}, { color: command ? 'custom_green' : 'red' });
 		} catch (e) {
 			console.log(e);
 		}

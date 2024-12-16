@@ -1,4 +1,4 @@
-import { GuildMember, ChannelType, EmbedBuilder } from 'discord.js';
+import { GuildMember, ChannelType, EmbedBuilder, Channel, TextChannel } from 'discord.js';
 import { DB } from '../modules/database.js';
 
 client.on('guildMemberAdd', async (member: GuildMember) => {
@@ -58,7 +58,10 @@ client.on('guildMemberAdd', async (member: GuildMember) => {
 			.setDescription('Рады приветствовать на нашем сервере!\nУбедительно просим Вас ознакомиться с нашими правилами в канале *#rules*')
 			.setFooter({
 				text: `${member.user.tag} | ID:${member.id} | ${new Date().toLocaleDateString()}`
-			})
-		client.channels.cache.get(channelJoin).send({ content: member.toString(), embeds: [embed] });
+			});
+
+		global.client.channels.fetch(channelJoin)
+			.then((channel: TextChannel) => channel.send({ content: member.toString(), embeds: [embed] }))
+			.catch(console.error);
 	}
 });

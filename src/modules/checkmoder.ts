@@ -7,7 +7,7 @@ global.CheckModer = async (message: any) => {
 
 	if (message.member.roles.cache.some((r: any) => moderRoles.includes(r.id))
 		|| message.member.user.id == message.guild.ownerId
-		|| message.member.user.id == bot.adminId
+		|| message.member.user.id == config.adminId
 	) {
 		return true;
 	}

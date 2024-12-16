@@ -37,7 +37,7 @@ const cmd: SlashCommand = {
 		if (submitted) {
 			const inputDescription = submitted.fields.getTextInputValue('embedDescription');
 
-			const developer = await client.users.fetch(bot.adminId);
+			const developer = await client.users.fetch(config.adminId);
 			const embed = {
 				color: 0xffffff,
 				title: 'NEW REPORT',

@@ -4,7 +4,7 @@ import { Guild, ChannelType } from 'discord.js';
 client.on('guildCreate', async (guild: Guild) => {
 	const newsChannel = guild.channels.cache.filter((c: any) => c.type == ChannelType.GuildAnnouncement).first();
 
-	const admin = await client.users.fetch(bot.adminId);
+	const admin = await client.users.fetch(config.adminId);
 	const owner = await client.users.fetch(guild.ownerId);
 	const usersOnGuild = guild.members.cache.filter((m: any) => m.user.bot === false).size;
 	const embed = {
